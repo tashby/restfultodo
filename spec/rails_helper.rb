@@ -17,27 +17,6 @@ Shoulda::Matchers.configure do |config|
   end
 end
 
-#[...]
-Rspec.configuration do |config|
-  #[...]
-  # add 'FactoryGirl' methods
-  config.include FactoryGirl::Syntax::Methods
-
-  #start by truncating all the tables but then use the faster transaction strategy the rest of the time.
-  config.before(:suite) do
-    DatabaseCleaner.clean_with(:truncation)
-    DatabaseCleaner.strategy = :transaction
-  end
-
-  # start the transaction strategy as examples are run
-  config.around(:each) do |example|
-    DatabaseCleaner.cleaning do
-      example.run
-    end
-  end
-  #[...]
-end
-
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end
@@ -51,7 +30,7 @@ end
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
 #
-# Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
+Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 
 # Checks for pending migration and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove this line.
@@ -85,4 +64,20 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+  config.include FactoryGirl::Syntax::Methods
+
+  #start by truncating all the tables but then use the faster transaction strategy the rest of the time.
+  config.before(:suite) do
+    DatabaseCleaner.clean_with(:truncation)
+    DatabaseCleaner.strategy = :transaction
+  end
+
+  # start the transaction strategy as examples are run
+  config.around(:each) do |example|
+    DatabaseCleaner.cleaning do
+      example.run
+    end
+  end
+
+  config.include RequestSpecHelper, type: :request
 end
